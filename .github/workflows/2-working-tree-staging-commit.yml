@@ -1,0 +1,157 @@
+name: Step 2 # Working tree, staging et commit
+
+on:
+  push:
+    branches:
+      - "feature/robot-status"
+    paths:
+      - "robot/config.yaml"
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+
+env:
+  STEP_3_FILE: ".github/steps/3-history-restore-vscode.md"
+  TOOLKIT_REPOSITORY: "ENSTARobotics/exercise-toolkit-fr"
+  TOOLKIT_REF: "632879ddcd7da33ae214f828a939a5d4ef93a3bd"
+
+jobs:
+  find_exercise:
+    if: |
+      !github.event.repository.is_template
+    name: Retrouver l'Issue de l'exercice
+    uses: ENSTARobotics/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@632879ddcd7da33ae214f828a939a5d4ef93a3bd
+
+  check_step_work:
+    name: Vérifier le premier commit local
+    runs-on: ubuntu-latest
+    needs: [find_exercise]
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - name: Récupérer le dépôt et l'historique
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Récupérer les templates français
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.TOOLKIT_REPOSITORY }}
+          path: exercise-toolkit-fr
+          ref: ${{ env.TOOLKIT_REF }}
+
+      - name: Retrouver le dernier commentaire de progression
+        id: find-last-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          direction: last
+
+      - name: Indiquer que le travail est en cours de vérification
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit-fr/markdown-templates/step-feedback/checking-work.md
+          edit-mode: replace
+
+      - name: Vérifier max_speed
+        id: check-config
+        continue-on-error: true
+        shell: bash
+        run: grep -Eq '^[[:space:]]*max_speed:[[:space:]]*0\.8[[:space:]]*$' robot/config.yaml
+
+      - name: Vérifier qu'un commit existe sur la branche
+        id: check-commit
+        continue-on-error: true
+        shell: bash
+        run: |
+          git fetch origin main
+          count="$(git rev-list --count origin/main..HEAD)"
+          echo "Commits devant main : $count"
+          test "$count" -ge 1
+
+      - name: Publier les résultats
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          edit-mode: replace
+          file: exercise-toolkit-fr/markdown-templates/step-feedback/step-results-table.md
+          vars: |
+            step_number: 2
+            results_table:
+              - description: "robot/config.yaml contient max_speed: 0.8"
+                passed: ${{ steps.check-config.outcome == 'success' }}
+              - description: "La branche contient au moins un commit propre"
+                passed: ${{ steps.check-commit.outcome == 'success' }}
+
+      - name: Arrêter si une vérification échoue
+        if: contains(steps.*.outcome, 'failure')
+        run: exit 1
+
+  post_next_step_content:
+    name: Afficher l'étape 3
+    needs: [find_exercise, check_step_work]
+    runs-on: ubuntu-latest
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v6
+
+      - name: Récupérer les templates français
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.TOOLKIT_REPOSITORY }}
+          path: exercise-toolkit-fr
+          ref: ${{ env.TOOLKIT_REF }}
+
+      - name: Confirmer l'étape terminée
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit-fr/markdown-templates/step-feedback/step-finished-prepare-next-step.md
+          vars: |
+            next_step_number: 3
+
+      - name: Publier l'étape 3
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: ${{ env.STEP_3_FILE }}
+
+      - name: Indiquer que la progression est surveillée
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit-fr/markdown-templates/step-feedback/watching-for-progress.md
+
+      - name: Passer à l'étape 3
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          current_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/2-working-tree-staging-commit.yml" --jq '.state')"
+          if [ "$current_state" = "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/2-working-tree-staging-commit.yml/disable"
+          fi
+
+          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/3-history-restore-vscode.yml" --jq '.state')"
+          if [ "$next_state" != "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/3-history-restore-vscode.yml/enable"
+          fi

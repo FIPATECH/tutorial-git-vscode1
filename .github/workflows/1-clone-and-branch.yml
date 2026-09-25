@@ -1,0 +1,81 @@
+name: Step 1 # Cloner et publier une branche
+
+on:
+  push:
+    branches:
+      - "feature/robot-status"
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+
+env:
+  STEP_2_FILE: ".github/steps/2-working-tree-staging-commit.md"
+  TOOLKIT_REPOSITORY: "ENSTARobotics/exercise-toolkit-fr"
+  TOOLKIT_REF: "632879ddcd7da33ae214f828a939a5d4ef93a3bd"
+
+jobs:
+  find_exercise:
+    if: |
+      !github.event.repository.is_template
+    name: Retrouver l'Issue de l'exercice
+    uses: ENSTARobotics/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@632879ddcd7da33ae214f828a939a5d4ef93a3bd
+
+  post_next_step_content:
+    name: Afficher l'étape 2
+    needs: [find_exercise]
+    runs-on: ubuntu-latest
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v6
+
+      - name: Récupérer les templates français
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.TOOLKIT_REPOSITORY }}
+          path: exercise-toolkit-fr
+          ref: ${{ env.TOOLKIT_REF }}
+
+      - name: Confirmer la publication de la branche
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit-fr/markdown-templates/step-feedback/step-finished-prepare-next-step.md
+          vars: |
+            next_step_number: 2
+
+      - name: Publier l'étape 2
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: ${{ env.STEP_2_FILE }}
+
+      - name: Indiquer que la progression est surveillée
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit-fr/markdown-templates/step-feedback/watching-for-progress.md
+
+      - name: Passer à l'étape 2
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          current_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/1-clone-and-branch.yml" --jq '.state')"
+          if [ "$current_state" = "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/1-clone-and-branch.yml/disable"
+          fi
+
+          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/2-working-tree-staging-commit.yml" --jq '.state')"
+          if [ "$next_state" != "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/2-working-tree-staging-commit.yml/enable"
+          fi

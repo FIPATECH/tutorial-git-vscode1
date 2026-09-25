@@ -1,0 +1,80 @@
+name: Step 5 # Review et merge
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+  pull-requests: write
+
+env:
+  REVIEW_FILE: ".github/steps/x-review.md"
+  TOOLKIT_REPOSITORY: "ENSTARobotics/exercise-toolkit-fr"
+  TOOLKIT_REF: "632879ddcd7da33ae214f828a939a5d4ef93a3bd"
+
+jobs:
+  explain_unmerged_close:
+    if: |
+      !github.event.repository.is_template &&
+      github.event.pull_request.head.ref == 'feature/robot-status' &&
+      github.event.pull_request.merged == false
+    name: Expliquer une fermeture sans merge
+    runs-on: ubuntu-latest
+    steps:
+      - name: Répondre dans la pull request
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: "Cette pull request a été fermée sans être mergée. Rouvre-la puis utilise **Merge pull request** lorsque le changement est prêt."
+            });
+
+  find_exercise:
+    if: |
+      !github.event.repository.is_template &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.ref == 'feature/robot-status'
+    name: Retrouver l'Issue de l'exercice
+    uses: ENSTARobotics/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@632879ddcd7da33ae214f828a939a5d4ef93a3bd
+
+  post_review_content:
+    name: Publier le bilan dans la pull request
+    needs: [find_exercise]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v6
+
+      - name: Publier le bilan final dans Conversation
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ github.repository }}
+          issue-number: ${{ github.event.pull_request.number }}
+          file: ${{ env.REVIEW_FILE }}
+
+      - name: Désactiver le dernier workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/5-review-merge.yml" --jq '.state')"
+          if [ "$state" = "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/5-review-merge.yml/disable"
+          fi
+
+  finish_exercise:
+    name: Terminer l'exercice
+    needs: [find_exercise, post_review_content]
+    uses: ENSTARobotics/exercise-toolkit-fr/.github/workflows/finish-exercise.yml@632879ddcd7da33ae214f828a939a5d4ef93a3bd
+    with:
+      issue-url: ${{ needs.find_exercise.outputs.issue-url }}
+      exercise-title: "Git & VS Code"

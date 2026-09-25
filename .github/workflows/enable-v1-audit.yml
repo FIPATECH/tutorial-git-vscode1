@@ -1,0 +1,24 @@
+name: Activer Step 0 pour le test V1
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/enable-v1-audit.yml"
+
+permissions:
+  actions: write
+
+jobs:
+  enable:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Activer Step 0
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/0-start-exercise.yml" --jq '.state' 2>/dev/null || true)"
+          if [ "$state" != "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/0-start-exercise.yml/enable"
+          fi

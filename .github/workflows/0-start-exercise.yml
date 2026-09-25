@@ -97,11 +97,12 @@ jobs:
           # Laisse à GitHub le temps d'enregistrer un événement déjà parti.
           sleep 2
 
-          head_sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/feature/robot-status" --jq '.object.sha' 2>/dev/null || true)"
-          if [ -n "$head_sha" ]; then
+          if head_sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/feature/robot-status" --jq '.object.sha' 2>/dev/null)"; then
             run_count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/1-clone-and-branch.yml/runs?branch=feature/robot-status&head_sha=$head_sha&per_page=1" --jq '.total_count')"
             if [ "$run_count" -eq 0 ]; then
               echo "La branche existe déjà : lancement immédiat de l'étape 1."
               gh workflow run 1-clone-and-branch.yml --ref feature/robot-status
             fi
+          else
+            echo "Aucune branche feature/robot-status à rattraper."
           fi

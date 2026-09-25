@@ -1,28 +1,51 @@
-## Étape 4 : comprendre le remote puis ouvrir une pull request
+## Étape 4 : comprendre la synchronisation avec GitHub puis ouvrir une pull request
 
 Tes commits locaux sont maintenant publiés sur GitHub. Avant d'ouvrir la pull request, prends deux minutes pour comprendre ce que Git suit réellement.
 
-### Branche locale et branche distante
+### Branche locale et branche de référence
 
-Affiche les remotes :
+Tu travailles directement sur une **branche locale**, ici `feature/robot-status`.
+
+Quand tu as exécuté `git push -u origin feature/robot-status`, Git a aussi créé la branche correspondante sur GitHub et les a associées.
+
+La branche de référence utilisée par défaut pour les prochains `push` et `pull` s'appelle la **branche amont** (_upstream branch_).
+
+Dans ton dépôt, Git relie :
+
+```text
+feature/robot-status
+        │
+        │ upstream
+        ▼
+origin/feature/robot-status
+        │
+        │ représente le dernier état connu de
+        ▼
+feature/robot-status sur GitHub
+```
+
+Le point important est que `origin/feature/robot-status` n'est pas directement la branche hébergée sur GitHub : c'est une référence conservée dans ton dépôt local.
+
+Affiche d'abord ton remote :
 
 ```bash
 git remote -v
 ```
 
-Puis les branches et leurs upstreams :
+Puis les branches locales et leur branche amont :
 
 ```bash
 git branch -vv
 ```
 
-Tu devrais voir que `feature/robot-status` suit une branche distante du type :
+Git appelle `origin/feature/robot-status` une **référence de suivi distant** (_remote-tracking branch_) : elle mémorise localement le dernier état connu de la branche correspondante sur GitHub.
 
-```text
-origin/feature/robot-status
-```
+En résumé :
 
-Attention : `origin/feature/robot-status` n'est pas une deuxième branche que tu édites directement. C'est une **remote-tracking branch**, une référence locale représentant l'état du remote connu par ton Git.
+- `feature/robot-status` : ta branche locale, celle que tu modifies ;
+- `feature/robot-status` sur GitHub : la vraie branche distante hébergée par GitHub ;
+- `origin/feature/robot-status` : la représentation locale du dernier état connu de cette branche distante ;
+- **upstream** : l'association par défaut entre ta branche locale et cette référence distante.
 
 ### `fetch`, `pull` et `push`
 
@@ -40,9 +63,9 @@ git log --oneline --graph --decorate --all
 
 À retenir :
 
-- `git fetch` récupère les nouveaux objets et met à jour les références distantes ;
-- `git pull` récupère puis intègre les changements dans ta branche courante ;
-- `git push` envoie tes commits locaux vers le remote.
+- `git fetch` récupère les nouveaux commits et met à jour les références `origin/...`, **sans modifier les fichiers de ta branche courante** ;
+- `git pull` récupère les changements puis les intègre dans ta branche courante ;
+- `git push` envoie tes commits locaux vers la branche correspondante sur le remote.
 
 ### Vérifier avant la PR
 
@@ -52,23 +75,23 @@ Exécute encore :
 git status
 ```
 
-Ton working tree doit être propre et ta branche doit être à jour avec son upstream.
+Git doit indiquer qu'il n'y a plus de modification locale non commitée et que ta branche est à jour avec sa branche amont.
 
 ### Ouvrir la pull request
 
-Tu connais déjà les PR grâce au tutoriel GitHub Basics. Ici, la différence est que **tout le travail a été produit localement**, puis publié avec `git push`.
+Tu connais déjà les pull requests grâce au tutoriel **[GitHub Basics](https://github.com/ENSTARobotics/tutorial-github-basics)**. Ici, la différence est que **tout le travail a été produit localement**, puis publié avec `git push`.
 
 [**Créer ma pull request →**](../../compare/main...feature/robot-status?expand=1)
 
 Choisis :
 
-- **base** : `main`
-- **compare** : `feature/robot-status`
+- **base** : `main`, la branche de destination ;
+- **compare** : `feature/robot-status`, la branche qui contient tes changements.
 
 Utilise un titre clair, par exemple :
 
 ```text
-Update robot configuration
+Mettre à jour la configuration du robot
 ```
 
 Ajoute une vraie description qui résume ce que tu as fait et pourquoi.

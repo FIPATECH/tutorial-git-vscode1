@@ -10,20 +10,29 @@ Dans le terminal :
 git log --oneline --graph --decorate --all
 ```
 
+Ces options modifient seulement l'affichage :
+
+- `--oneline` affiche un commit par ligne ;
+- `--graph` dessine les embranchements de l'historique ;
+- `--decorate` affiche les noms de branches et autres références près des commits ;
+- `--all` inclut toutes les références connues, pas seulement la branche courante.
+
 Tu dois voir au minimum :
 
-- `main` ;
-- `feature/robot-status` ;
+- `main`, ta branche principale locale ;
+- `feature/robot-status`, ta branche de travail locale ;
 - ton commit récent ;
 - des références comme `origin/main` ou `origin/feature/robot-status`.
 
-Affiche le dernier commit en détail :
+Ces noms qui commencent par `origin/` sont des **références locales représentant l'état connu des branches sur GitHub**. L'étape suivante expliquera précisément leur rôle.
+
+Git utilise aussi le nom spécial **`HEAD`** pour désigner l'endroit où tu te trouves actuellement dans l'historique, en pratique le dernier commit de ta branche courante.
+
+Affiche ce commit en détail :
 
 ```bash
 git show HEAD
 ```
-
-`HEAD` désigne ta position actuelle dans l'historique, généralement le dernier commit de la branche sur laquelle tu te trouves.
 
 Dans VS Code, ouvre **Source Control** puis la vue **Graph** si elle est disponible. Tu observes le même historique, mais visuellement.
 
@@ -61,7 +70,9 @@ La modification a disparu.
 
 ### 3. Comprendre `.gitignore`
 
-Les projets robotiques génèrent souvent beaucoup de fichiers qu'on ne veut **pas** versionner : builds, caches Python, environnements virtuels, logs, etc.
+Un fichier **`.gitignore`** indique à Git quels fichiers ou dossiers non suivis il doit ignorer. Ils restent sur ton ordinateur mais ne viennent plus polluer `git status` et ne sont pas ajoutés par erreur à un commit.
+
+Les projets robotiques génèrent souvent beaucoup de fichiers qu'on ne veut **pas** versionner : dossiers de compilation, caches Python, environnements virtuels, logs, etc.
 
 Ouvre `.gitignore` dans VS Code et ajoute :
 
@@ -86,7 +97,7 @@ git diff --staged
 
 Dans **Source Control** :
 
-1. saisis un message clair, par exemple `Ignore generated files` ;
+1. saisis un message clair, par exemple `Ignorer les fichiers générés` ;
 2. clique sur **Commit**.
 
 Puis vérifie le résultat dans le terminal :

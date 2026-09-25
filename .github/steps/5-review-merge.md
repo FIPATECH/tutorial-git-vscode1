@@ -8,11 +8,11 @@ Ta pull request est valide. Le travail local est maintenant devenu une propositi
 
 Avant de merger :
 
-1. ouvre **Files changed** ;
+1. ouvre **Files changed**, la vue du diff de la pull request ;
 2. vérifie le changement de `robot/config.yaml` ;
 3. vérifie les nouvelles règles de `.gitignore` ;
 4. ouvre **Commits** : tu dois voir les commits créés depuis ton ordinateur ;
-5. ouvre **Checks** et attends que les automatisations soient terminées.
+5. ouvre **Checks**, la vue des vérifications automatiques, et attends qu'elles soient terminées.
 
 Cette vue permet de relier tout le tutoriel :
 
@@ -38,7 +38,7 @@ Quand tout est correct :
 
 1. clique sur **Merge pull request** ;
 2. confirme le merge ;
-3. supprime la branche distante si GitHub propose **Delete branch**.
+3. supprime la branche sur GitHub si GitHub propose **Delete branch**. Ta branche locale existe encore sur ton ordinateur ; on la supprimera seulement après avoir resynchronisé `main`.
 
 Après le merge, Mona publiera le bilan ici.
 

@@ -1,6 +1,6 @@
 <!-- tutorial-git-vscode:review -->
 
-## Bilan : ton workflow Git local est complet
+## Bilan : ton cycle de travail Git local est complet
 
 🎉 Tu viens d'effectuer le cycle Git que tu réutiliseras sur les projets du club.
 
@@ -27,7 +27,7 @@ git push
    ↓
 pull request
    ↓
-review
+relecture
    ↓
 merge
 ```
@@ -51,7 +51,7 @@ git switch main
 git pull --ff-only
 ```
 
-`git pull --ff-only` met à jour `main` uniquement si Git peut avancer proprement sans fabriquer de merge local inattendu.
+L'option `--ff-only` signifie **fast-forward only** : Git accepte uniquement d'avancer ton `main` local jusqu'au nouveau commit de `main` sur GitHub. S'il faudrait créer un commit de merge local pour y arriver, la commande s'arrête au lieu de décider à ta place.
 
 Supprime ensuite la branche locale devenue inutile :
 
@@ -59,11 +59,15 @@ Supprime ensuite la branche locale devenue inutile :
 git branch -d feature/robot-status
 ```
 
-Et nettoie les références distantes qui n'existent plus :
+L'option `-d` demande à Git de supprimer la branche locale seulement si son travail a bien été intégré.
+
+Enfin, nettoie les anciennes références de branches distantes :
 
 ```bash
 git fetch --prune
 ```
+
+`--prune` retire les références `origin/...` qui correspondent à des branches supprimées sur GitHub. Cela ne supprime pas tes branches locales.
 
 Termine par :
 
@@ -96,7 +100,9 @@ git pull --ff-only
 git switch -c feature/ma-tache
 ```
 
-### Ce qui vient ensuite
+### Dans le parcours ENSTARobotics
+
+Le tutoriel précédent, **[GitHub Basics](https://github.com/ENSTARobotics/tutorial-github-basics)**, t'a appris les concepts depuis le navigateur. Celui-ci t'a appris à appliquer le même cycle depuis ton ordinateur.
 
 Tu connais maintenant le chemin normal. Le prochain tutoriel utile sera consacré à ce qui arrive quand deux historiques se rencontrent mal : **les conflits de merge**, leur lecture et leur résolution dans VS Code.
 

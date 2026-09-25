@@ -6,23 +6,26 @@ Tu as déjà manipulé des branches et des commits depuis GitHub.com. Maintenant
 
 Le dépôt que tu vois sur GitHub est le **dépôt distant**. Avec Git, tu travailles normalement sur une copie complète stockée sur ta machine : le **dépôt local**.
 
+Le dépôt local possède ses propres fichiers, branches et commits. Il n'est pas synchronisé en permanence avec GitHub : certaines commandes servent à récupérer des changements, d'autres à publier les tiens.
+
 ```mermaid
 flowchart LR
-    A[GitHub<br/>dépôt distant] -->|git clone| B[Ordinateur<br/>dépôt local]
-    B -->|git push| A
-    A -->|git fetch / git pull| B
+    A[GitHub<br/>dépôt distant] -->|copier ou récupérer| B[Ordinateur<br/>dépôt local]
+    B -->|publier des commits| A
 ```
 
 ### 1. Cloner ta copie du tutoriel
 
-Ouvre un terminal dans le dossier où tu ranges tes projets, puis exécute :
+Ouvre un **terminal**, c'est-à-dire une interface texte dans laquelle tu peux saisir des commandes, dans le dossier où tu ranges tes projets. Puis exécute :
 
 ```bash
 git clone https://github.com/{{ full_repo_name }}.git
 cd {{ repo_name }}
 ```
 
-`git clone` télécharge les fichiers **et l'historique Git**. Git configure aussi automatiquement un **remote**, c'est-à-dire une destination distante associée au dépôt local.
+`git clone` télécharge les fichiers **et l'historique Git**.
+
+`cd` signifie **change directory** : cette commande demande au terminal de se placer dans le dossier du dépôt que tu viens de cloner. Git configure aussi automatiquement un **remote**, c'est-à-dire une destination distante associée au dépôt local.
 
 Par convention, le remote principal s'appelle généralement `origin`.
 
@@ -31,6 +34,8 @@ Vérifie-le :
 ```bash
 git remote -v
 ```
+
+L'option `-v` signifie **verbose** : elle demande à Git d'afficher davantage de détails, ici les URL utilisées pour récupérer et publier les changements.
 
 Tu dois voir des URL qui pointent vers :
 
@@ -46,13 +51,17 @@ Si la commande `code` est disponible :
 code .
 ```
 
+Dans cette commande, `.` représente le **dossier courant**. `code .` signifie donc « ouvrir le dossier dans lequel je me trouve avec VS Code ».
+
 Sinon, ouvre Visual Studio Code puis **File → Open Folder...** et sélectionne le dossier `{{ repo_name }}`.
 
 Ouvre ensuite le terminal intégré de VS Code avec **Terminal → New Terminal**. À partir de maintenant, tu peux réaliser toutes les commandes du tutoriel directement dans ce terminal.
 
 ### 3. Vérifier ton identité Git
 
-Chaque commit contient un auteur. Vérifie la configuration actuelle :
+Chaque commit contient un auteur. Ici, l'option `--global` demande à Git de lire ou modifier la configuration de **ton utilisateur sur cet ordinateur**, et pas uniquement celle de ce dépôt.
+
+Vérifie la configuration actuelle :
 
 ```bash
 git config --global user.name
@@ -91,6 +100,8 @@ Vérifie aussi ta branche actuelle :
 git branch --show-current
 ```
 
+L'option `--show-current` demande simplement à Git d'afficher le nom de la branche sur laquelle tu te trouves.
+
 Tu dois être sur `main`.
 
 ### 5. Créer une branche de travail
@@ -100,6 +111,10 @@ Dans le club, on évite de travailler directement sur `main`. Crée une branche 
 ```bash
 git switch -c feature/robot-status
 ```
+
+Le préfixe `feature/` est ici une **convention de nommage** : il permet de reconnaître rapidement qu'il s'agit d'une branche créée pour développer une fonctionnalité. Git lui-même n'impose pas ce préfixe.
+
+`git switch` change de branche et l'option `-c` signifie ici **create** : elle crée d'abord la nouvelle branche puis te place dessus.
 
 Puis vérifie :
 
@@ -115,10 +130,22 @@ git push -u origin feature/robot-status
 
 Décomposition :
 
-- `git push` envoie tes commits vers un remote ;
-- `origin` est le remote GitHub ;
-- `feature/robot-status` est ta branche ;
-- `-u` enregistre la branche distante comme **upstream** de ta branche locale. Les prochains `git push` et `git pull` pourront donc fonctionner sans répéter le nom du remote et de la branche.
+- `git push` **publie sur GitHub les commits de ta branche locale** ;
+- `origin` est le nom du remote GitHub créé automatiquement par `git clone` ;
+- `feature/robot-status` est le nom de ta branche ;
+- `-u` signifie ici : « associe ma branche locale à cette branche sur GitHub ».
+
+Cette branche distante associée devient la **branche amont**, appelée **upstream branch** dans Git. Une fois cette relation enregistrée, Git sait par défaut où envoyer tes prochains `git push` et depuis quelle branche distante récupérer avec `git pull`.
+
+Tu peux visualiser cette relation avec :
+
+```bash
+git branch -vv
+```
+
+Ici, `-vv` demande un affichage détaillé des branches locales, notamment leur dernier commit et leur branche amont lorsqu'elle existe.
+
+Si tout est correct, la ligne de `feature/robot-status` contient une indication comme `[origin/feature/robot-status]`.
 
 > [!IMPORTANT]
 > Utilise exactement le nom `feature/robot-status` pour cette branche : l'automatisation du tutoriel l'attend.
@@ -130,6 +157,6 @@ Dès que la branche apparaît sur GitHub, Mona détecte ton premier `push` et pu
 
 Le clone d'un dépôt public ne nécessite pas forcément d'authentification, mais **push** modifie GitHub et doit donc t'identifier.
 
-Utilise la méthode déjà configurée sur ton ordinateur, typiquement HTTPS avec le gestionnaire d'identifiants Git, GitHub CLI ou SSH. Si aucune méthode n'est configurée, suis la documentation GitHub sur l'authentification Git avant de continuer.
+Utilise la méthode déjà configurée sur ton ordinateur, typiquement **HTTPS** ou **SSH**, deux méthodes permettant à Git de s'authentifier auprès de GitHub. Tu peux aussi utiliser **GitHub CLI (`gh`)**, l'outil officiel en ligne de commande de GitHub. Si aucune méthode n'est configurée, suis la documentation GitHub sur l'authentification Git avant de continuer.
 
 </details>

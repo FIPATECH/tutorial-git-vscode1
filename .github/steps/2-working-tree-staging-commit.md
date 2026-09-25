@@ -1,4 +1,4 @@
-## Étape 2 : comprendre working tree, staging et commit
+## Étape 2 : comprendre le dossier de travail, la préparation et le commit
 
 Ta branche existe maintenant à la fois sur ton ordinateur et sur GitHub.
 
@@ -6,17 +6,21 @@ On va faire une vraie modification et suivre son trajet jusqu'à l'historique Gi
 
 ### Les trois zones à comprendre
 
+Git distingue plusieurs états pour tes modifications :
+
 ```mermaid
 flowchart LR
-    A[Working tree<br/>fichiers modifiés] -->|git add| B[Staging area<br/>prochain commit]
+    A[Dossier de travail<br/>working tree] -->|git add| B[Zone de préparation<br/>staging area]
     B -->|git commit| C[Historique local<br/>commits]
     C -->|git push| D[GitHub<br/>remote origin]
 ```
 
-- le **working tree** correspond aux fichiers présents dans ton dossier de travail ;
-- la **staging area** est la sélection exacte des changements qui entreront dans le prochain commit ;
-- un **commit** enregistre cette sélection dans l'historique local ;
-- `git push` publie ensuite les commits sur GitHub.
+- le **dossier de travail** (_working tree_) correspond aux fichiers tels qu'ils existent actuellement dans ton dossier ;
+- la **zone de préparation** (_staging area_) contient uniquement les changements sélectionnés pour le prochain commit ;
+- un **commit** enregistre le contenu préparé dans l'historique local ;
+- `git push` publie ensuite ces commits locaux sur GitHub.
+
+Le verbe anglais **to stage** signifie donc « ajouter un changement à la zone de préparation ».
 
 ### 1. Modifier le fichier dans VS Code
 
@@ -40,9 +44,11 @@ max_speed: 0.8
 
 Enregistre le fichier.
 
-Dans l'onglet **Source Control** de VS Code, tu dois maintenant voir `robot/config.yaml` dans **Changes**.
+Dans VS Code, ouvre le panneau **Source Control** : c'est l'interface graphique intégrée qui permet de voir et manipuler l'état Git du projet. Tu dois maintenant voir `robot/config.yaml` dans **Changes**, c'est-à-dire les changements non encore préparés.
 
 ### 2. Inspecter avant de préparer le commit
+
+Un **diff** est une vue ligne par ligne de ce qui a changé entre deux états.
 
 Dans le terminal :
 
@@ -51,9 +57,9 @@ git status
 git diff
 ```
 
-`git diff` montre les différences entre ton working tree et la staging area.
+Ici, `git diff` montre les changements du dossier de travail qui ne sont pas encore dans la zone de préparation.
 
-Ne stage pas tout aveuglément avec `git add .` pour cet exercice. Sélectionne précisément le fichier voulu :
+N'ajoute pas tout aveuglément avec `git add .` : le point `.` désigne ici tout le dossier courant. Pour cet exercice, sélectionne précisément le fichier voulu :
 
 ```bash
 git add robot/config.yaml
@@ -66,9 +72,9 @@ git status
 git diff --staged
 ```
 
-`git diff --staged` montre **exactement ce qui entrera dans le prochain commit**.
+`git diff --staged` montre **exactement ce qui est dans la zone de préparation et entrera dans le prochain commit**.
 
-Dans VS Code, le fichier est maintenant passé de **Changes** à **Staged Changes**. La CLI et l'interface graphique représentent donc le même état Git.
+Dans VS Code, le fichier est maintenant passé de **Changes** à **Staged Changes**, c'est-à-dire « changements préparés ». Le terminal et l'interface graphique représentent donc le même état Git.
 
 ### 3. Savoir revenir en arrière
 
@@ -84,7 +90,7 @@ Vérifie avec :
 git status
 ```
 
-Puis stage-le de nouveau :
+Puis ajoute-le de nouveau à la zone de préparation :
 
 ```bash
 git add robot/config.yaml
@@ -94,10 +100,10 @@ Cette commande n'annule pas ta modification : elle retire simplement le fichier 
 
 ### 4. Créer le commit
 
-Crée maintenant un commit local. Le message suivant est un exemple, pas un mot de passe :
+Crée maintenant un commit local. L'option `-m` permet d'écrire directement le **message du commit**. Le message suivant est un exemple, pas un mot de passe :
 
 ```bash
-git commit -m "Increase robot max speed"
+git commit -m "Augmenter la vitesse maximale du robot"
 ```
 
 Vérifie immédiatement :
@@ -106,6 +112,8 @@ Vérifie immédiatement :
 git status
 git log -1 --oneline
 ```
+
+`git log` affiche l'historique des commits ; `-1` limite l'affichage au dernier commit et `--oneline` l'affiche sous une forme compacte sur une seule ligne.
 
 À ce stade, ton commit existe **sur ton ordinateur**, mais pas encore sur GitHub.
 

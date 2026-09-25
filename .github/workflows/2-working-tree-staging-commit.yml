@@ -75,15 +75,14 @@ jobs:
         shell: bash
         run: grep -Eq '^[[:space:]]*max_speed:[[:space:]]*0\.8[[:space:]]*$' robot/config.yaml
 
-      - name: Vérifier qu'un commit existe sur la branche
+      - name: Vérifier que robot/config.yaml a été modifié dans un commit
         id: check-commit
         continue-on-error: true
         shell: bash
         run: |
-          git fetch origin main
-          count="$(git rev-list --count origin/main..HEAD)"
-          echo "Commits devant main : $count"
-          test "$count" -ge 1
+          count="$(git rev-list --count HEAD -- robot/config.yaml)"
+          echo "Commits ayant touché robot/config.yaml : $count"
+          test "$count" -ge 2
 
       - name: Publier les résultats
         uses: GrantBirki/comment@608e41b19bc973020ec0e189ebfdae935d7fe0cc # v2.1.1
@@ -98,7 +97,7 @@ jobs:
             results_table:
               - description: "robot/config.yaml contient max_speed: 0.8"
                 passed: ${{ steps.check-config.outcome == 'success' }}
-              - description: "La branche contient au moins un commit propre"
+              - description: "robot/config.yaml a été enregistré dans un nouveau commit"
                 passed: ${{ steps.check-commit.outcome == 'success' }}
 
       - name: Arrêter si une vérification échoue
@@ -188,8 +187,12 @@ jobs:
                grep -Fxq 'log/' /tmp/.gitignore &&
                grep -Fxq '__pycache__/' /tmp/.gitignore &&
                grep -Fxq '.venv/' /tmp/.gitignore; then
-              ahead="$(gh api "repos/${GITHUB_REPOSITORY}/compare/main...feature/robot-status" --jq '.ahead_by')"
-              if [ "$ahead" -ge 2 ]; then
+              config_commit="$(gh api --method GET "repos/${GITHUB_REPOSITORY}/commits" -f sha='feature/robot-status' -f path='robot/config.yaml' -f per_page=1 --jq '.[0].sha // empty')"
+              gitignore_commit="$(gh api --method GET "repos/${GITHUB_REPOSITORY}/commits" -f sha='feature/robot-status' -f path='.gitignore' -f per_page=1 --jq '.[0].sha // empty')"
+
+              if [ -n "$config_commit" ] &&
+                 [ -n "$gitignore_commit" ] &&
+                 [ "$config_commit" != "$gitignore_commit" ]; then
                 head_sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/feature/robot-status" --jq '.object.sha')"
                 run_count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/3-history-restore-vscode.yml/runs?branch=feature/robot-status&head_sha=$head_sha&per_page=1" --jq '.total_count')"
                 if [ "$run_count" -eq 0 ]; then

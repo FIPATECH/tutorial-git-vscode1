@@ -80,15 +80,20 @@ jobs:
           grep -Fxq '__pycache__/' .gitignore
           grep -Fxq '.venv/' .gitignore
 
-      - name: Vérifier l'historique de la branche
+      - name: Vérifier que les deux modifications sont dans deux commits distincts
         id: check-history
         continue-on-error: true
         shell: bash
         run: |
-          git fetch origin main
-          count="$(git rev-list --count origin/main..HEAD)"
-          echo "Commits devant main : $count"
-          test "$count" -ge 2
+          config_commit="$(git log -1 --format=%H -- robot/config.yaml)"
+          gitignore_commit="$(git log -1 --format=%H -- .gitignore)"
+
+          echo "Dernier commit de robot/config.yaml : $config_commit"
+          echo "Dernier commit de .gitignore : $gitignore_commit"
+
+          test -n "$config_commit"
+          test -n "$gitignore_commit"
+          test "$config_commit" != "$gitignore_commit"
 
       - name: Publier les résultats
         uses: GrantBirki/comment@608e41b19bc973020ec0e189ebfdae935d7fe0cc # v2.1.1
@@ -103,7 +108,7 @@ jobs:
             results_table:
               - description: "Les fichiers générés sont ignorés"
                 passed: ${{ steps.check-gitignore.outcome == 'success' }}
-              - description: "La branche contient au moins deux commits"
+              - description: "Les deux modifications ont été enregistrées dans deux commits distincts"
                 passed: ${{ steps.check-history.outcome == 'success' }}
 
       - name: Arrêter si une vérification échoue

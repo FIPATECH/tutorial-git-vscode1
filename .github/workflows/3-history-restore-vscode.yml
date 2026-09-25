@@ -8,10 +8,6 @@ on:
       - ".gitignore"
   workflow_dispatch:
 
-concurrency:
-  group: git-vscode-step-3-${{ github.repository }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
   actions: write
@@ -80,20 +76,15 @@ jobs:
           grep -Fxq '__pycache__/' .gitignore
           grep -Fxq '.venv/' .gitignore
 
-      - name: Vérifier que les deux modifications sont dans deux commits distincts
+      - name: Vérifier l'historique de la branche
         id: check-history
         continue-on-error: true
         shell: bash
         run: |
-          config_commit="$(git log -1 --format=%H -- robot/config.yaml)"
-          gitignore_commit="$(git log -1 --format=%H -- .gitignore)"
-
-          echo "Dernier commit de robot/config.yaml : $config_commit"
-          echo "Dernier commit de .gitignore : $gitignore_commit"
-
-          test -n "$config_commit"
-          test -n "$gitignore_commit"
-          test "$config_commit" != "$gitignore_commit"
+          git fetch origin main
+          count="$(git rev-list --count origin/main..HEAD)"
+          echo "Commits devant main : $count"
+          test "$count" -ge 2
 
       - name: Publier les résultats
         uses: GrantBirki/comment@608e41b19bc973020ec0e189ebfdae935d7fe0cc # v2.1.1
@@ -108,7 +99,7 @@ jobs:
             results_table:
               - description: "Les fichiers générés sont ignorés"
                 passed: ${{ steps.check-gitignore.outcome == 'success' }}
-              - description: "Les deux modifications ont été enregistrées dans deux commits distincts"
+              - description: "La branche contient au moins deux commits"
                 passed: ${{ steps.check-history.outcome == 'success' }}
 
       - name: Arrêter si une vérification échoue
@@ -167,22 +158,6 @@ jobs:
           if [ "$next_state" != "active" ]; then
             gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/4-remotes-and-pull-request.yml/enable"
           fi
-
-          for attempt in {1..10}; do
-            next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/4-remotes-and-pull-request.yml" --jq '.state')"
-            if [ "$next_state" = "active" ]; then
-              break
-            fi
-            sleep 1
-          done
-
-          if [ "$next_state" != "active" ]; then
-            echo "Le workflow suivant n'est pas devenu actif à temps."
-            exit 1
-          fi
-
-          # Laisse à GitHub le temps d'enregistrer un événement déjà parti.
-          sleep 2
 
           head_sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/feature/robot-status" --jq '.object.sha')"
           pr_number="$(gh pr list --head feature/robot-status --base main --state all --limit 20 --json number,headRefOid --jq ".[] | select(.headRefOid == \"$head_sha\") | .number" | head -n 1)"

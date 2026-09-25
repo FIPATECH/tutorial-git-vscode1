@@ -16,10 +16,6 @@ on:
         required: true
         type: string
 
-concurrency:
-  group: git-vscode-step-4-${{ github.repository }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
   actions: write
@@ -247,24 +243,12 @@ jobs:
             gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/5-review-merge.yml/enable"
           fi
 
-          for attempt in {1..10}; do
-            next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/5-review-merge.yml" --jq '.state')"
-            if [ "$next_state" = "active" ]; then
-              break
-            fi
-            sleep 1
-          done
-
-          if [ "$next_state" != "active" ]; then
-            echo "Le workflow suivant n'est pas devenu actif à temps."
-            exit 1
-          fi
-
-          # Laisse à GitHub le temps d'enregistrer un événement déjà parti.
-          sleep 2
-
           merged="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/$PR_NUMBER" --jq '.merged')"
           if [ "$merged" = "true" ]; then
-            echo "Le merge a déjà eu lieu : lancement immédiat de l'étape 5."
-            gh workflow run 5-review-merge.yml --ref main -f pr-number="$PR_NUMBER"
+            merge_sha="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/$PR_NUMBER" --jq '.merge_commit_sha')"
+            run_count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/5-review-merge.yml/runs?head_sha=$merge_sha&per_page=1" --jq '.total_count')"
+            if [ "$run_count" -eq 0 ]; then
+              echo "Le merge a déjà eu lieu : lancement immédiat de l'étape 5."
+              gh workflow run 5-review-merge.yml --ref main -f pr-number="$PR_NUMBER"
+            fi
           fi

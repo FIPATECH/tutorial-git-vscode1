@@ -13,10 +13,6 @@ on:
         required: true
         type: string
 
-concurrency:
-  group: git-vscode-step-5-${{ github.repository }}
-  cancel-in-progress: true
-
 permissions:
   contents: write
   actions: write

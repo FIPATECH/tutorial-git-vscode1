@@ -1,31 +1,102 @@
-<div align="center">
+<header>
 
-# 🎉 Félicitations github-actions[bot] ! 🎉
+# Git & VS Code
 
-<img src="https://octodex.github.com/images/welcometocat.png" height="200px" />
+<img src="https://octodex.github.com/images/Professortocat_v2.png" align="right" height="170px" />
 
-### 🌟 Tu as terminé l'exercice avec succès ! 🌟
+_Apprends le cycle de travail Git utilisé au quotidien dans le club, depuis ton ordinateur._
 
-## 🚀 Partage ta réussite
+</header>
 
-**Tu peux partager ce que tu viens d'apprendre et le dépôt de l'exercice.**
+## Bienvenue
 
-<a href="https://twitter.com/intent/tweet?text=Je%20viens%20de%20terminer%20l&#39;exercice%20GitHub%20%22Git%20%26amp%3B%20VS%20Code%22%20!%20%F0%9F%8E%89%0A%0Ahttps%3A%2F%2Fgithub.com%2FFIPATECH%2Ftutorial-git-vscode1%0A%0A%23GitHubSkills%20%23OpenSource%20%23GitHubLearn" target="_blank" rel="noopener noreferrer">
-  <img src="https://img.shields.io/badge/Partager%20sur%20X-1da1f2?style=for-the-badge&logo=x&logoColor=white" alt="Partager sur X" />
-</a>
-<a href="https://bsky.app/intent/compose?text=Je%20viens%20de%20terminer%20l&#39;exercice%20GitHub%20%22Git%20%26amp%3B%20VS%20Code%22%20!%20%F0%9F%8E%89%0A%0Ahttps%3A%2F%2Fgithub.com%2FFIPATECH%2Ftutorial-git-vscode1%0A%0A%23GitHubSkills%20%23OpenSource%20%23GitHubLearn" target="_blank" rel="noopener noreferrer">
-  <img src="https://img.shields.io/badge/Partager%20sur%20Bluesky-0085ff?style=for-the-badge&logo=bluesky&logoColor=white" alt="Partager sur Bluesky" />
-</a>
-<a href="https://www.linkedin.com/feed/?shareActive=true&text=Je%20viens%20de%20terminer%20l&#39;exercice%20GitHub%20%22Git%20%26amp%3B%20VS%20Code%22%20!%20%F0%9F%8E%89%0A%0Ahttps%3A%2F%2Fgithub.com%2FFIPATECH%2Ftutorial-git-vscode1%0A%0A%23GitHubSkills%20%23OpenSource%20%23GitHubLearn" target="_blank" rel="noopener noreferrer">
-  <img src="https://img.shields.io/badge/Partager%20sur%20LinkedIn-0077b5?style=for-the-badge&logo=linkedin&logoColor=white" alt="Partager sur LinkedIn" />
-</a>
+Ce tutoriel fait suite à **[GitHub Basics](https://github.com/ENSTARobotics/tutorial-github-basics)**.
 
-### 🎯 Et maintenant ?
+Dans le premier cours, tu as appris le modèle mental depuis le navigateur : dépôt, branche, commit, pull request, review et merge.
 
-[![](https://img.shields.io/badge/Revenir%20%C3%A0%20l'exercice-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/FIPATECH/tutorial-git-vscode1/issues/7)
-[![GitHub Skills](https://img.shields.io/badge/D%C3%A9couvrir%20GitHub%20Skills-000000?style=for-the-badge&logo=github&logoColor=white)](https://learn.github.com/skills)
+Ici, tu vas refaire le même cycle comme on le fait réellement sur un projet du club :
 
-*La meilleure façon d'apprendre reste de construire et d'expérimenter.* 🚀
+```text
+GitHub
+  ↓ clone
+ordinateur
+  ↓
+VS Code + terminal
+  ↓
+branche de travail
+  ↓
+modification
+  ↓
+changements préparés
+  ↓
+commit local
+  ↓ publication
+GitHub
+  ↓
+pull request
+  ↓
+merge
+  ↓
+mise à jour du dépôt local
+```
 
-</div>
+## Ce que tu vas apprendre
 
+Pendant l'exercice, tu vas apprendre à :
+
+- copier un dépôt GitHub sur ton ordinateur avec `git clone` ;
+- voir l'état de ton travail avec `git status` ;
+- comparer précisément tes modifications avec `git diff` ;
+- choisir les changements qui entreront dans le prochain commit avec `git add` ;
+- créer des commits locaux et lire leur historique ;
+- annuler proprement une modification locale avec `git restore` ;
+- créer une branche de travail avec `git switch` ;
+- comprendre comment ton dépôt local est relié à GitHub ;
+- utiliser le panneau **Source Control**, l'interface Git intégrée à VS Code, et son graphe d'historique ;
+- effectuer le cycle complet jusqu'à une pull request et son merge.
+
+Les termes comme **remote**, **origin**, **staging area**, **upstream** ou **HEAD** seront définis au moment où tu les rencontres.
+
+## Prérequis
+
+Avant de commencer :
+
+1. avoir un compte GitHub ;
+2. avoir **Git** installé sur ton ordinateur ;
+3. avoir **Visual Studio Code** installé ;
+4. avoir terminé **[GitHub Basics](https://github.com/ENSTARobotics/tutorial-github-basics)**, ou connaître déjà les notions de dépôt, branche, commit, pull request et merge.
+
+Tu peux vérifier Git avec :
+
+```bash
+git --version
+```
+
+Le cours est conçu pour être réalisé sur **ta machine locale**, pas dans **GitHub Codespaces**, l'environnement de développement que GitHub peut héberger directement dans le navigateur.
+
+## Démarrer
+
+Crée un nouveau dépôt à partir de ce **dépôt modèle** (_template_). Un dépôt modèle sert de point de départ : GitHub en copie les fichiers et les automatisations dans un nouveau dépôt indépendant. N'utilise pas **Fork** pour cet exercice : un fork est une copie liée au dépôt d'origine, alors qu'ici on veut une copie indépendante créée depuis le modèle.
+
+[![Commencer le cours](https://img.shields.io/badge/Commencer%20le%20cours-%E2%86%92-1f883d?style=for-the-badge&logo=git&labelColor=197935)](https://github.com/new?template_owner=ENSTARobotics&template_name=tutorial-git-vscode&owner=%40me&name=tutorial-git-vscode&description=Tutoriel%20interactif%20%3A%20apprendre%20Git%20avec%20VS%20Code&visibility=public)
+
+Après la création du dépôt :
+
+1. attends une vingtaine de secondes ;
+2. actualise la page ;
+3. ouvre l'Issue créée automatiquement par Mona ;
+4. suis ensuite les instructions depuis ton ordinateur.
+
+> [!NOTE]
+> Les étapes locales comme `git status` ou `git diff` ne quittent pas ton ordinateur. Le bot ne peut donc pas les espionner. Il valide uniquement les jalons qui arrivent réellement sur GitHub, par exemple la publication d'une branche, un commit poussé ou une pull request.
+
+<details>
+<summary>Le cours ne démarre pas ?</summary>
+
+Ouvre l'onglet **Actions** et vérifie le **workflow** **Step 0**. GitHub Actions est le système d'automatisation utilisé par le bot du cours ; un workflow est l'une de ces automatisations décrites dans le dépôt.
+
+</details>
+
+---
+
+Inspiré de [GitHub Skills - Introduction to Git](https://github.com/skills/introduction-to-git), de la documentation Git officielle et de la documentation Source Control de VS Code.

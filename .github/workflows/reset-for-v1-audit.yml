@@ -1,0 +1,24 @@
+name: Reset V1 audit
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/reset-for-v1-audit.yml"
+
+permissions:
+  actions: write
+  contents: write
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Préparer le dépôt de test
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/0-start-exercise.yml/enable" || true
+          gh api --method DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/feature/robot-status" || true

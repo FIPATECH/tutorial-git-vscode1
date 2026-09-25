@@ -1,31 +1,12 @@
-<div align="center">
+# Git &amp; VS Code
 
-# 🎉 Félicitations lilblueyes ! 🎉
+<img src="https://octodex.github.com/images/Professortocat_v2.png" align="right" height="200px" />
 
-<img src="https://octodex.github.com/images/welcometocat.png" height="200px" />
+Salut lilblueyes !
 
-### 🌟 Tu as terminé l'exercice avec succès ! 🌟
+Ton exercice est prêt.
 
-## 🚀 Partage ta réussite
+L'Issue ci-dessous est le point de départ et le journal de progression. Ensuite, le cours se déplacera avec toi : lorsque tu arriveras dans une pull request, le bot continuera directement dans sa conversation.
 
-**Tu peux partager ce que tu viens d'apprendre et le dépôt de l'exercice.**
-
-<a href="https://twitter.com/intent/tweet?text=Je%20viens%20de%20terminer%20l&#39;exercice%20GitHub%20%22Git%20%26amp%3B%20VS%20Code%22%20!%20%F0%9F%8E%89%0A%0Ahttps%3A%2F%2Fgithub.com%2FFIPATECH%2Ftutorial-git-vscode1%0A%0A%23GitHubSkills%20%23OpenSource%20%23GitHubLearn" target="_blank" rel="noopener noreferrer">
-  <img src="https://img.shields.io/badge/Partager%20sur%20X-1da1f2?style=for-the-badge&logo=x&logoColor=white" alt="Partager sur X" />
-</a>
-<a href="https://bsky.app/intent/compose?text=Je%20viens%20de%20terminer%20l&#39;exercice%20GitHub%20%22Git%20%26amp%3B%20VS%20Code%22%20!%20%F0%9F%8E%89%0A%0Ahttps%3A%2F%2Fgithub.com%2FFIPATECH%2Ftutorial-git-vscode1%0A%0A%23GitHubSkills%20%23OpenSource%20%23GitHubLearn" target="_blank" rel="noopener noreferrer">
-  <img src="https://img.shields.io/badge/Partager%20sur%20Bluesky-0085ff?style=for-the-badge&logo=bluesky&logoColor=white" alt="Partager sur Bluesky" />
-</a>
-<a href="https://www.linkedin.com/feed/?shareActive=true&text=Je%20viens%20de%20terminer%20l&#39;exercice%20GitHub%20%22Git%20%26amp%3B%20VS%20Code%22%20!%20%F0%9F%8E%89%0A%0Ahttps%3A%2F%2Fgithub.com%2FFIPATECH%2Ftutorial-git-vscode1%0A%0A%23GitHubSkills%20%23OpenSource%20%23GitHubLearn" target="_blank" rel="noopener noreferrer">
-  <img src="https://img.shields.io/badge/Partager%20sur%20LinkedIn-0077b5?style=for-the-badge&logo=linkedin&logoColor=white" alt="Partager sur LinkedIn" />
-</a>
-
-### 🎯 Et maintenant ?
-
-[![](https://img.shields.io/badge/Revenir%20%C3%A0%20l'exercice-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/FIPATECH/tutorial-git-vscode1/issues/1)
-[![GitHub Skills](https://img.shields.io/badge/D%C3%A9couvrir%20GitHub%20Skills-000000?style=for-the-badge&logo=github&logoColor=white)](https://learn.github.com/skills)
-
-*La meilleure façon d'apprendre reste de construire et d'expérimenter.* 🚀
-
-</div>
+[![](https://img.shields.io/badge/Ouvrir%20l'exercice-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/FIPATECH/tutorial-git-vscode1/issues/3)
 
